@@ -28,6 +28,35 @@ void	get_filename(t_ls *ft_ls, char *av)
 	ft_ls->flags.t_f.file = 1;
 }
 
+void	set_arg_flag(t_ls *ft_ls, char *av, int i)
+{
+	if (av[i] == 'l')
+		ft_ls->flags.t_f.l = 1;
+	else if (av[i] == 'r')
+		ft_ls->flags.t_f.r = 1;
+	else if (av[i] == 'R')
+		ft_ls->flags.t_f.big_r = 1;
+	else if (av[i] == 'a')
+		ft_ls->flags.t_f.a = 1;
+	else if (av[i] == 't')
+		ft_ls->flags.t_f.t = 1;
+	else if (av[i] == 'u')
+		ft_ls->flags.t_f.u = 1;
+	else if (av[i] == 'f')
+		ft_ls->flags.t_f.f = 1;
+	else if (av[i] == 'g')
+		ft_ls->flags.t_f.g = 1;
+	else if (av[i] == 'd')
+		ft_ls->flags.t_f.d = 1;
+	else
+	{
+		print_error(3, &av[i]);
+		print_error(1, NULL);
+		ft_memdel((void **)&ft_ls);
+		exit(0);
+	}
+}
+
 void	get_flag(t_ls *ft_ls, char *av)
 {
 	int i;
@@ -35,31 +64,7 @@ void	get_flag(t_ls *ft_ls, char *av)
 	i = 1;
 	while (av[i])
 	{
-		if (av[i] == 'l')
-			ft_ls->flags.t_f.l = 1;
-		else if (av[i] == 'r')
-			ft_ls->flags.t_f.r = 1;
-		else if (av[i] == 'R')
-			ft_ls->flags.t_f.big_r = 1;
-		else if (av[i] == 'a')
-			ft_ls->flags.t_f.a = 1;
-		else if (av[i] == 't')
-			ft_ls->flags.t_f.t = 1;
-		else if (av[i] == 'u')
-			ft_ls->flags.t_f.u = 1;
-		else if (av[i] == 'f')
-			ft_ls->flags.t_f.f = 1;
-		else if (av[i] == 'g')
-			ft_ls->flags.t_f.g = 1;
-		else if (av[i] == 'd')
-			ft_ls->flags.t_f.d = 1;
-		else
-		{
-			print_error(3, &av[i]);
-			print_error(1, NULL);
-			ft_memdel((void **)&ft_ls);
-			exit(0);
-		}
+		set_arg_flag(ft_ls, av, i);
 		i++;
 	}
 }

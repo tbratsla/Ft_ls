@@ -16,6 +16,17 @@
 #include "../Libft/inc/libft.h"
 #include "../Libft/ft_printf/inc/printf.h"
 
+typedef	struct			s_files
+{
+	struct s_files		*next;
+}						t_files;
+
+typedef	struct			s_dir
+{
+	t_files				*files;
+	struct s_dir		*next;
+}						t_dir;
+
 typedef	union			s_flags
 {
 	short				flag;
@@ -35,9 +46,10 @@ typedef	union			s_flags
 	}					t_f;
 }						t_flags;
 
-typedef struct	s_ls
+typedef struct			s_ls
 {
-	t_flags		flags;
-}				t_ls;
+	t_flags				flags;
+	t_dir				*dir;
+}						t_ls;
 
 #endif

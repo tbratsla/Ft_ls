@@ -13,19 +13,10 @@
 #ifndef FT_LS_H
 # define FT_LS_H
 
-#include "../Libft/inc/libft.h"
-#include "../Libft/ft_printf/inc/printf.h"
-
-typedef	struct			s_files
-{
-	struct s_files		*next;
-}						t_files;
-
-typedef	struct			s_dir
-{
-	t_files				*files;
-	struct s_dir		*next;
-}						t_dir;
+# include "../Libft/inc/libft.h"
+# include "../Libft/ft_printf/inc/printf.h"
+# include <sys/types.h>
+# include <dirent.h>
 
 typedef	union			s_flags
 {
@@ -46,10 +37,34 @@ typedef	union			s_flags
 	}					t_f;
 }						t_flags;
 
+typedef	struct			s_files
+{
+	char				*filename;
+	struct s_files		*next;
+}						t_files;
+
+typedef	struct			s_dir
+{
+	t_files				*files;
+	struct s_dir		*next;
+}						t_dir;
+
 typedef struct			s_ls
 {
 	t_flags				flags;
 	t_dir				*dir;
 }						t_ls;
+
+/*
+**	Error functions
+*/
+
+void					print_error(int flag, char *message);
+
+/*
+**	Parse functions
+*/
+
+void					parsing_arg(t_ls *ft_ls, int ac, char **av);
 
 #endif

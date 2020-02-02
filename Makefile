@@ -12,7 +12,9 @@
 
 NAME = ft_ls
 
-SRC = ft_ls.c
+SRC = 	ft_ls.c		\
+		errors.c	\
+		parse.c
 
 SRC_DIR = srcs
 
@@ -35,10 +37,10 @@ LIB = ./Libft/libft.a
 all: $(NAME)
 
 $(NAME): $(LIB) $(PRINTF) $(OBJS)
+	@echo "Make ft_ls"
 	@$(CC) $(FLAGS) $(OBJS) $(PRINTF) $(LIB) -o $(NAME)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-		@echo "Make ft_ls"
 		@mkdir -p $(OBJ_DIR)
 		@$(CC) $(FLAGS) -o $@ -c $< $(H_DIR)
 

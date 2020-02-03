@@ -39,12 +39,16 @@ typedef	union			s_flags
 
 typedef	struct			s_files
 {
-	char				*filename;
+	int					info;
+	char				*direct_name;
+	int					type;
+	int					leng;
 	struct s_files		*next;
 }						t_files;
 
 typedef	struct			s_dir
 {
+	char				*filename;
 	t_files				*files;
 	struct s_dir		*next;
 }						t_dir;

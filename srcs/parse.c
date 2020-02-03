@@ -12,26 +12,43 @@
 
 #include "../inc/ft_ls.h"
 
-t_files *get_filename(t_files *files, char *av)
+void	check_file(char *av)
 {
-	t_files  *start;
+	DIR		*dir;
+	char	*tmp;
 
+	dir = opendir(av);
+	if (!dir)
+	{
+		tmp = ft_strjoin("ft_ls: ", av);
+		perror(tmp);
+		free(tmp);
+		exit(1);
+	}
+	closedir(dir);
+}
+
+t_dir		*get_filename(t_dir *files, char *av)
+{
+	t_dir	*start;
+
+	check_file(av);
 	if (!files)
 	{
-		files = ft_memalloc(sizeof(t_files));
-		(files)->filename = ft_strdup(av);
-		(files)->next = NULL;
+		files = (t_dir *)ft_memalloc(sizeof(t_dir));
+		files->filename = ft_strdup(av);
+		files->next = NULL;
+		return (files);
 	}
 	else
 	{
 		start = files;
-		while (files)
-			files = (files)->next;
-		files = ft_memalloc(sizeof(t_files));
-		(files)->filename = ft_strdup(av);
-		(files)->next = NULL;
+		while (files->next)
+			files = files->next;
+		files->next = (t_dir *)ft_memalloc(sizeof(t_dir));
+		files->next->filename = ft_strdup(av);
 		files = start;
-		return (start);
+		return (files);
 	}
 	return (files);
 }
@@ -97,8 +114,13 @@ void	parsing_arg(t_ls *ft_ls, int ac, char **av)
 		else
 		{
 			ft_ls->flags.t_f.file = 1;
-			ft_ls->dir->files = get_filename(ft_ls->dir->files, av[i]);
+			ft_ls->dir = get_filename(ft_ls->dir, av[i]);
 		}
 		i++;
+	}
+	if (!ft_ls->dir)
+	{
+		ft_ls->dir = ft_memalloc(sizeof(t_dir));
+		ft_ls->dir->filename = ft_strdup(".");
 	}
 }

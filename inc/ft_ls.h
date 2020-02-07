@@ -39,6 +39,7 @@ typedef	union			s_flags
 
 typedef	struct			s_files
 {
+	struct stat			get_stat;
 	int					info;
 	char				*direct_name;
 	int					type;
@@ -53,7 +54,7 @@ typedef	struct			s_dir
 	struct s_dir		*next;
 }						t_dir;
 
-typedef struct			s_ls
+typedef struct			s_ls 
 {
 	t_flags				flags;
 	t_dir				*dir;
@@ -70,5 +71,21 @@ void					print_error(int flag, char *message);
 */
 
 void					parsing_arg(t_ls *ft_ls, int ac, char **av);
+
+/*
+**	Debug functions
+*/
+
+void					print_direct(t_dir *direct);
+void					print_file(t_files *file, unsigned char flag);
+
+/*
+**	Sort functions
+*/
+
+t_files					*sort_alp_file(t_files *file);
+t_files					*sort_rev_alp_file(t_files *file);
+t_files					*sort_time_file(t_files *file);
+void					svap_file(t_files *file1, t_files *file2);
 
 #endif

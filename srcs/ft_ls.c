@@ -41,12 +41,22 @@ t_dir	*add_new_direct(t_dir *direct, t_files *file)
 
 void	set_file_params(t_files *files, struct dirent *entry, t_dir *direct)
 {
+	char	*tmp;
+	char	*tmp1;
+
 	files->info = entry->d_ino;
 	files->direct_name = ft_strdup(entry->d_name);
 	files->type = entry->d_type;
 	files->leng = entry->d_reclen;
 	files->next = NULL;
-	stat(direct->filename, &files->get_stat);
+	direct = (void *)direct;
+	tmp = ft_strjoin(direct->filename, "/");
+	tmp1 = ft_strjoin(tmp, files->direct_name);
+	stat(tmp1, &files->get_stat);
+	free(tmp);
+	free(tmp1);
+	if (direct->max_len < (int)ft_strlen(files->direct_name))
+		direct->max_len = ft_strlen(files->direct_name);
 }
 
 t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct)
@@ -55,6 +65,7 @@ t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct)
 
 	if (!files)
 	{
+		direct->count = 0;
 		files = (t_files *)ft_memalloc(sizeof(t_files));
 		set_file_params(files, entry, direct);
 		return (files);
@@ -62,6 +73,7 @@ t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct)
 	else
 	{
 		start = files;
+		direct->count++;
 		while (files->next)
 			files = files->next;
 		files->next = (t_files *)ft_memalloc(sizeof(t_files));
@@ -100,7 +112,12 @@ void	read_by_filename(t_ls *ft_ls)
 			file = sort_alp_file(file);
 		if (ft_ls->flags.t_f.big_r == 1)
 			direct = add_new_direct(direct, file);
-		print_file(file, ft_ls->flags.t_f.a);
+		if (ft_ls->flags.t_f.big_r == 1 && ft_strcmp(direct->filename, "."))
+			ft_printf("%s:\n", direct->filename);
+		print_file(file, ft_ls, direct->max_len, direct->count);
+		ft_printf("\n");
+		if (ft_ls->flags.t_f.big_r == 1)
+			ft_printf("\n");
 		closedir(dir);
 		direct = direct->next;
 	}
@@ -111,6 +128,7 @@ t_ls	*init(void)
 	t_ls *ft_ls;
 
 	ft_ls = ft_memalloc(sizeof(t_ls));
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ft_ls->win);
 	return (ft_ls);
 }
 

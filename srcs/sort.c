@@ -82,7 +82,7 @@ t_files *sort_time_file(t_files *file)
 	start = file;
 	while (file->next)
 	{
-		ft_printf("%i %lld\n", file->get_stat.st_ctime, file->next->get_stat.st_ctime);
+		// ft_printf("%s %lld %s %lld\n",  file->direct_name, file->get_stat.st_ctime, file->next->direct_name, file->next->get_stat.st_ctime);
 		if (file->get_stat.st_mtime < file->next->get_stat.st_mtime)
 		{
 			svap_file(file, file->next);

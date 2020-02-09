@@ -36,6 +36,8 @@ t_dir		*get_filename(t_dir *files, char *av)
 	if (!files)
 	{
 		files = (t_dir *)ft_memalloc(sizeof(t_dir));
+		files->max_len = 0;
+		files->count = 0;
 		files->filename = ft_strdup(av);
 		files->next = NULL;
 		return (files);
@@ -43,6 +45,7 @@ t_dir		*get_filename(t_dir *files, char *av)
 	else
 	{
 		start = files;
+		files->count++;
 		while (files->next)
 			files = files->next;
 		files->next = (t_dir *)ft_memalloc(sizeof(t_dir));

@@ -17,6 +17,8 @@
 # include "../Libft/ft_printf/inc/printf.h"
 # include <sys/types.h>
 # include <dirent.h>
+# include <termios.h>
+# include <sys/ioctl.h>
 
 typedef	union			s_flags
 {
@@ -49,6 +51,8 @@ typedef	struct			s_files
 
 typedef	struct			s_dir
 {
+	int					count;
+	int					max_len;
 	char				*filename;
 	t_files				*files;
 	struct s_dir		*next;
@@ -56,6 +60,8 @@ typedef	struct			s_dir
 
 typedef struct			s_ls 
 {
+	struct winsize		win;
+	char				*str;
 	t_flags				flags;
 	t_dir				*dir;
 }						t_ls;
@@ -77,7 +83,7 @@ void					parsing_arg(t_ls *ft_ls, int ac, char **av);
 */
 
 void					print_direct(t_dir *direct);
-void					print_file(t_files *file, unsigned char flag);
+void					print_file(t_files *file, t_ls *ft_ls, int max_len, int count);
 
 /*
 **	Sort functions

@@ -62,11 +62,13 @@ void	set_file_params(t_files *files, struct dirent *entry, t_dir *direct)
 t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct)
 {
 	t_files *start;
+	int		i;
 
 	if (!files)
 	{
 		direct->count = 0;
 		files = (t_files *)ft_memalloc(sizeof(t_files));
+		files->num = 0;
 		set_file_params(files, entry, direct);
 		return (files);
 	}
@@ -76,9 +78,11 @@ t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct)
 		direct->count++;
 		while (files->next)
 			files = files->next;
+		i = files->num + 1;
 		files->next = (t_files *)ft_memalloc(sizeof(t_files));
 		files = files->next;
 		set_file_params(files, entry, direct);
+		files->num = i;
 		files = start;
 		return (files);
 	}

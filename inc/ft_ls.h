@@ -42,6 +42,7 @@ typedef	union			s_flags
 typedef	struct			s_files
 {
 	struct stat			get_stat;
+	int					num;
 	int					info;
 	char				*direct_name;
 	int					type;
@@ -93,5 +94,11 @@ t_files					*sort_alp_file(t_files *file);
 t_files					*sort_rev_alp_file(t_files *file);
 t_files					*sort_time_file(t_files *file);
 void					svap_file(t_files *file1, t_files *file2);
+
+/*
+** Free functions
+*/
+
+void					free_file_list(t_files *file, int count);
 
 #endif

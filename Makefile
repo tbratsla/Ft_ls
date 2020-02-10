@@ -16,7 +16,8 @@ SRC = 	ft_ls.c		\
 		errors.c	\
 		parse.c		\
 		debug_func.c\
-		sort.c
+		sort.c		\
+		free.c
 
 SRC_DIR = srcs
 

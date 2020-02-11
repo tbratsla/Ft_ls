@@ -12,19 +12,15 @@
 
 #include "../inc/ft_ls.h"
 
-// void	free_file_list(t_files *file, int count)
-// {
-	// t_files *next;
+void	free_double_str(char **str, int count)
+{
+	int i;
 
-	// next = file;
-	// while (count > 0)
-	// {
-	// 	next = file->next;
-	// 	ft_memdel((void **) &file->direct_name);
-	// 	ft_memdel((void **) &file);
-	// 	file = next;
-	// 	count--;
-	// }
-// 	ft_memdel((void **) &file->direct_name);
-// 	ft_memdel((void **) &file);
-// }
+	i = 0;
+	while (i < count)
+	{
+		ft_strdel(&str[i]);
+		i++;
+	}
+	ft_memdel((void **)str);
+}

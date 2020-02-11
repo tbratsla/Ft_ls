@@ -17,7 +17,10 @@ SRC = 	ft_ls.c		\
 		parse.c		\
 		debug_func.c\
 		sort.c		\
-		free.c
+		free.c		\
+		output.c	\
+		math.c		\
+		l_output.c
 
 SRC_DIR = srcs
 
@@ -27,7 +30,7 @@ SRCS = $(addprefix $(SRC_DIR)/,$(SRC))
 
 OBJS = $(addprefix $(OBJ_DIR)/,$(SRC:.c=.o))
 
-FLAGS = -Wall -Wextra -Werror -fsanitize=address -g
+FLAGS = -Wall -Wextra -Werror #-fsanitize=address -g
 
 PRINTF = ./Libft/ft_printf/libftprintf.a
 

@@ -12,7 +12,7 @@
 
 #include "../inc/ft_ls.h"
 
-t_dir	*add_new_direct(t_dir *direct, t_files *file)
+t_dir	*add_new_direct(t_dir *direct, t_files *file, t_ls *ft_ls)
 {
 	t_dir	*start;
 	t_dir	*next;
@@ -22,7 +22,12 @@ t_dir	*add_new_direct(t_dir *direct, t_files *file)
 	next = start->next;
 	while (file)
 	{
-		if (file->direct_name[0] == '.')
+		if (!ft_strcmp(file->direct_name, ".") || !ft_strcmp(file->direct_name, ".."))
+		{
+			file = file->next;
+			continue ;
+		}
+		if (ft_ls->flags.t_f.a == 0 && file->direct_name[0] == '.')
 		{
 			file = file->next;
 			continue ;
@@ -67,6 +72,7 @@ t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct)
 	if (!files)
 	{
 		direct->count = 0;
+		direct->vis_count = 0;
 		files = (t_files *)ft_memalloc(sizeof(t_files));
 		files->num = 0;
 		set_file_params(files, entry, direct);
@@ -76,6 +82,8 @@ t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct)
 	{
 		start = files;
 		direct->count++;
+		if (entry->d_name[0] != '.')
+			direct->vis_count++;
 		while (files->next)
 			files = files->next;
 		i = files->num + 1;
@@ -115,13 +123,15 @@ void	read_by_filename(t_ls *ft_ls)
 		else
 			file = sort_alp_file(file);
 		if (ft_ls->flags.t_f.big_r == 1)
-			direct = add_new_direct(direct, file);
+			direct = add_new_direct(direct, file, ft_ls);
 		if (ft_ls->flags.t_f.big_r == 1 && ft_strcmp(direct->filename, "."))
-			ft_printf("%s:\n", direct->filename);
-		print_file(file, ft_ls, direct->max_len, direct->count);
-		ft_printf("\n");
-		if (ft_ls->flags.t_f.big_r == 1)
-			ft_printf("\n");
+			ft_printf("\n%s:\n", direct->filename);
+		if (ft_ls->flags.t_f.l == 0)
+			print_file(file, ft_ls, direct->max_len,\
+				ft_ls->flags.t_f.a == 1 ? direct->count : direct->vis_count);
+		else
+			print_l(file, ft_ls,\
+				ft_ls->flags.t_f.a == 1 ? direct->count : direct->vis_count);
 		closedir(dir);
 		direct = direct->next;
 	}

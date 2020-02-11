@@ -28,7 +28,7 @@ void	check_file(char *av)
 	closedir(dir);
 }
 
-t_dir		*get_filename(t_dir *files, char *av)
+t_dir	*get_filename(t_dir *files, char *av)
 {
 	t_dir	*start;
 

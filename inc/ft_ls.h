@@ -53,6 +53,7 @@ typedef	struct			s_files
 typedef	struct			s_dir
 {
 	int					count;
+	int					vis_count;
 	int					max_len;
 	char				*filename;
 	t_files				*files;
@@ -84,7 +85,13 @@ void					parsing_arg(t_ls *ft_ls, int ac, char **av);
 */
 
 void					print_direct(t_dir *direct);
+
+/*
+**	Output functions
+*/
+
 void					print_file(t_files *file, t_ls *ft_ls, int max_len, int count);
+void					print_l(t_files *file, t_ls *ft_ls, int count);
 
 /*
 **	Sort functions
@@ -99,6 +106,15 @@ void					svap_file(t_files *file1, t_files *file2);
 ** Free functions
 */
 
-void					free_file_list(t_files *file, int count);
+void					free_double_str(char **str, int count);
+
+/*
+** Math function
+*/
+
+int						max_div(int a, int b);
+int						count_str_len(int max_len);
+int						count_word_in_str(t_ls *ft_ls, int max_len, int count);
+char					**get_double_str(t_files *file, int count);
 
 #endif

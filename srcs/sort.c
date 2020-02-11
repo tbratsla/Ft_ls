@@ -75,14 +75,13 @@ t_files	*sort_alp_file(t_files *file)
 	return (file);
 }
 
-t_files *sort_time_file(t_files *file)
+t_files	*sort_time_file(t_files *file)
 {
 	t_files *start;
 
 	start = file;
 	while (file->next)
 	{
-		// ft_printf("%s %lld %s %lld\n",  file->direct_name, file->get_stat.st_ctime, file->next->direct_name, file->next->get_stat.st_ctime);
 		if (file->get_stat.st_mtime < file->next->get_stat.st_mtime)
 		{
 			svap_file(file, file->next);

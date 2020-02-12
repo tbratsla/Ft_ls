@@ -54,7 +54,6 @@ void	set_file_params(t_files *files, struct dirent *entry, t_dir *direct)
 	files->type = entry->d_type;
 	files->leng = entry->d_reclen;
 	files->next = NULL;
-	direct = (void *)direct;
 	tmp = ft_strjoin(direct->filename, "/");
 	tmp1 = ft_strjoin(tmp, files->direct_name);
 	stat(tmp1, &files->get_stat);
@@ -118,8 +117,8 @@ void	read_by_filename(t_ls *ft_ls)
 			file = add_new_file(file, entry, direct);
 		if (ft_ls->flags.t_f.r == 1)
 			file = sort_rev_alp_file(file);
-		else if (ft_ls->flags.t_f.t == 1)
-			file = sort_time_file(file);
+		else if (ft_ls->flags.t_f.t == 1 || ft_ls->flags.t_f.u)
+			file = sort_time_file(file, ft_ls->flags.t_f.u);
 		else
 			file = sort_alp_file(file);
 		if (ft_ls->flags.t_f.big_r == 1)
@@ -133,8 +132,10 @@ void	read_by_filename(t_ls *ft_ls)
 			print_l(file, ft_ls,\
 				ft_ls->flags.t_f.a == 1 ? direct->count : direct->vis_count);
 		closedir(dir);
+		ft_free_files(file);
 		direct = direct->next;
 	}
+	free_direct(ft_ls->dir);
 }
 
 t_ls	*init(void)
@@ -154,6 +155,6 @@ int		main(int ac, char **av)
 
 	parsing_arg(ft_ls, ac, av);
 	read_by_filename(ft_ls);
-	// system("leaks -q ft_ls");
+	free(ft_ls);
 	return (0);
 }

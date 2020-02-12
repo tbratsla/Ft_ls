@@ -75,14 +75,20 @@ t_files	*sort_alp_file(t_files *file)
 	return (file);
 }
 
-t_files	*sort_time_file(t_files *file)
+t_files	*sort_time_file(t_files *file, unsigned char flag)
 {
 	t_files *start;
+	time_t	time1;
+	time_t	time2;
 
 	start = file;
 	while (file->next)
 	{
-		if (file->get_stat.st_mtime < file->next->get_stat.st_mtime)
+		time1 = flag == 1 ? file->get_stat.st_atime\
+		: file->get_stat.st_mtime;
+		time2 = flag == 1 ? file->next->get_stat.st_atime\
+		: file->next->get_stat.st_mtime;
+		if (time1 < time2)
 		{
 			svap_file(file, file->next);
 			file = start;

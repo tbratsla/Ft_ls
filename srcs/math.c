@@ -48,7 +48,7 @@ char	**get_double_str(t_files *file, int count)
 	int		i;
 	t_files *start;
 
-	str = ft_memalloc(sizeof(char *) * count);
+	str = ft_memalloc(sizeof(char *) * (count + 1));
 	start = file;
 	i = 0;
 	while (start)
@@ -60,5 +60,6 @@ char	**get_double_str(t_files *file, int count)
 		}
 		start = start->next;
 	}
+	str[i] = NULL;
 	return (str);
 }

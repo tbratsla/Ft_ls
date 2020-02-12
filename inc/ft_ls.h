@@ -99,7 +99,7 @@ void					print_l(t_files *file, t_ls *ft_ls, int count);
 
 t_files					*sort_alp_file(t_files *file);
 t_files					*sort_rev_alp_file(t_files *file);
-t_files					*sort_time_file(t_files *file);
+t_files					*sort_time_file(t_files *file, unsigned char flag);
 void					svap_file(t_files *file1, t_files *file2);
 
 /*
@@ -107,6 +107,8 @@ void					svap_file(t_files *file1, t_files *file2);
 */
 
 void					free_double_str(char **str, int count);
+void					free_direct(t_dir *direct);
+void					ft_free_files(t_files *file);
 
 /*
 ** Math function

@@ -19,8 +19,37 @@ void	free_double_str(char **str, int count)
 	i = 0;
 	while (i < count)
 	{
-		ft_strdel(&str[i]);
+		ft_memdel((void **)&str[i]);
 		i++;
 	}
 	ft_memdel((void **)str);
+}
+
+void	ft_free_files(t_files *file)
+{
+	t_files *next;
+
+	next = NULL;
+	while (file)
+	{
+		next = file->next;
+		ft_memdel((void **) &file->direct_name);
+		ft_memdel((void **) &file);
+		file = next;
+	}
+}
+
+void	free_direct(t_dir *direct)
+{
+	t_dir	*next;
+
+	next = NULL;
+	while (direct)
+	{
+		ft_free_files(direct->files);
+		next = direct->next;
+		ft_memdel((void **) &direct->filename);
+		ft_memdel((void **) &direct);
+		direct = next;
+	}
 }

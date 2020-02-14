@@ -12,43 +12,49 @@
 
 #include "printf.h"
 
+void	copy_param(const char *format, t_split *s, char **pos)
+{
+	s->j = s->chr;
+	while (format[s->j])
+	{
+		if ((ft_isalpha(format[s->j]) && format[s->j] != 'l' &&\
+			format[s->j] != 'h' && format[s->j] != 'L') || format[s->j] == '%')
+		{
+			pos[s->i] = ft_strnew(s->j - s->chr + 1);
+			ft_strncpy(pos[s->i], &format[s->chr], s->j - s->chr + 1);
+			s->i++;
+			break ;
+		}
+		s->j++;
+	}
+}
+
 char	**ft_make_pos(const char *format, int *amount)
 {
-	int		i[3];
+	t_split	s;
 	char	**pos;
-	int		chr;
 
 	pos = ft_memalloc(sizeof(char *) * *amount);
-	chr = 0;
-	i[1] = 0;
-	while ((chr = ft_strchr(&format[chr], '%') - format + 1) > 0)
-		if (format[chr] == '%')
-			chr++;
+	s.chr = 0;
+	s.i = 0;
+	while ((s.chr = ft_strchr(&format[s.chr], '%') - format + 1) > 0
+		&& s.chr < (int)ft_strlen(format))
+	{
+		if (format[s.chr] == '%')
+			s.chr++;
 		else
 		{
-			i[2] = chr;
-			while (format[i[2]])
+			copy_param(format, &s, pos);
+			if (!format[s.j])
 			{
-				if ((ft_isalpha(format[i[2]]) && format[i[2]] != 'l' &&
-			format[i[2]] != 'h' && format[i[2]] != 'L') || format[i[2]] == '%')
-				{
-					pos[i[1]] = ft_strnew(i[2] - chr + 1);
-					ft_strncpy(pos[i[1]], &format[chr], i[2] - chr + 1);
-					i[1]++;
-					break ;
-				}
-				i[2]++;
-			}
-			if (!format[i[2]])
-			{
-				(*amount) -= i[1];
+				(*amount) -= s.i;
 				if (pos)
 					return (pos);
-				else
-					return (NULL);
+				return (NULL);
 			}
-			chr = i[2];
+			s.chr = s.j;
 		}
+	}
 	return (pos);
 }
 

@@ -117,7 +117,7 @@ void	read_by_filename(t_ls *ft_ls)
 			file = add_new_file(file, entry, direct);
 		if (ft_ls->flags.t_f.r == 1)
 			file = sort_rev_alp_file(file);
-		else if (ft_ls->flags.t_f.t == 1 || ft_ls->flags.t_f.u)
+		else if (ft_ls->flags.t_f.t == 1 || ft_ls->flags.t_f.u == 1)
 			file = sort_time_file(file, ft_ls->flags.t_f.u);
 		else
 			file = sort_alp_file(file);

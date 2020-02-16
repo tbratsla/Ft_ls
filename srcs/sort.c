@@ -35,6 +35,9 @@ void	svap_file(t_files *file1, t_files *file2)
 	file2->type = type;
 	file2->direct_name = name;
 	file2->get_stat = stat;
+	stat = file1->get_lstat;
+	file1->get_lstat = file2->get_lstat;
+	file2->get_lstat = stat;
 }
 
 t_files	*sort_rev_alp_file(t_files *file)
@@ -75,20 +78,17 @@ t_files	*sort_alp_file(t_files *file)
 	return (file);
 }
 
-t_files	*sort_time_file(t_files *file, unsigned char flag)
+t_files	*sort_time_file(t_files *file)
 {
 	t_files *start;
-	time_t	time1;
-	time_t	time2;
+	t_time	time;
 
 	start = file;
 	while (file->next)
 	{
-		time1 = flag == 1 ? file->get_stat.st_atime\
-		: file->get_stat.st_mtime;
-		time2 = flag == 1 ? file->next->get_stat.st_atime\
-		: file->next->get_stat.st_mtime;
-		if (time1 < time2)
+		time.time1 = file->get_stat.st_mtime;
+		time.time2 = file->next->get_stat.st_mtime;
+		if (time.time1 < time.time2)
 		{
 			svap_file(file, file->next);
 			file = start;

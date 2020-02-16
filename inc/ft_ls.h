@@ -20,6 +20,10 @@
 # include <time.h>
 # include <termios.h>
 # include <sys/ioctl.h>
+# include <sys/stat.h>
+# include <sys/acl.h>
+# include <pwd.h>
+# include <grp.h>
 
 typedef	union			s_flags
 {
@@ -40,9 +44,20 @@ typedef	union			s_flags
 	}					t_f;
 }						t_flags;
 
+typedef	struct			s_time
+{
+	time_t				time1;
+	time_t				time2;
+}						t_time;
+
 typedef	struct			s_files
 {
 	struct stat			get_stat;
+	struct stat			get_lstat;
+	struct passwd		*passwd;
+	struct group		*group;
+	char				*user_name;
+	char				*group_name;
 	int					num;
 	int					info;
 	char				*direct_name;
@@ -54,7 +69,12 @@ typedef	struct			s_files
 typedef	struct			s_dir
 {
 	int					count;
+	int					total;
 	int					vis_count;
+	int					link_len;
+	int					bite_size_len;
+	int					u_name_len;
+	int					g_name_len;
 	int					max_len;
 	char				*filename;
 	t_files				*files;
@@ -92,7 +112,7 @@ void					print_direct(t_dir *direct);
 */
 
 void					print_file(t_files *file, t_ls *ft_ls, int max_len, int count);
-void					print_l(t_files *file, t_ls *ft_ls, int count);
+void					print_l(t_files *file, t_ls *ft_ls, int count, t_dir *direct);
 
 /*
 **	Sort functions
@@ -100,7 +120,7 @@ void					print_l(t_files *file, t_ls *ft_ls, int count);
 
 t_files					*sort_alp_file(t_files *file);
 t_files					*sort_rev_alp_file(t_files *file);
-t_files					*sort_time_file(t_files *file, unsigned char flag);
+t_files					*sort_time_file(t_files *file);
 void					svap_file(t_files *file1, t_files *file2);
 
 /*

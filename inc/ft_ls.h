@@ -40,7 +40,8 @@ typedef	union			s_flags
 		unsigned char	g		: 1;
 		unsigned char	d		: 1;
 		unsigned char	file	: 1;
-		unsigned char	any		: 6;
+		unsigned char	n_bite	: 1;
+		unsigned char	any		: 5;
 	}					t_f;
 }						t_flags;
 

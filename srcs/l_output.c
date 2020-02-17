@@ -41,15 +41,25 @@ char	*create_l_param_str(t_dir *direct)
 	free(itoa_tmp);
 	free(tmp);
 	tmp = str;
-	str = ft_strjoin(tmp, "s %");
+	str = ft_strjoin(tmp, "s");
 	free(tmp);
-	itoa_tmp = ft_itoa(direct->bite_size_len);
+	return (str);
+}
+
+char	*get_bite_param_str(t_dir *direct)
+{
+	char *tmp;
+	char *itoa;
+	char *str;
+
+	str = ft_strdup(" %");
 	tmp = str;
-	str = ft_strjoin(tmp, itoa_tmp);
-	free(itoa_tmp);
+	itoa = ft_itoa(direct->bite_size_len);
+	str = ft_strjoin(tmp, itoa);
 	free(tmp);
+	free(itoa);
 	tmp = str;
-	str = ft_strjoin(tmp, "i ");
+	str = ft_strjoin(tmp, "i");
 	free(tmp);
 	return (str);
 }
@@ -89,10 +99,25 @@ void	print_l(t_files *file, t_ls *ft_ls, int count, t_dir *direct)
 		{
 			print_permissions(start);
 			str = create_l_param_str(direct);
-			ft_printf(str, start->get_stat.st_nlink, start->user_name, start->group_name, start->get_stat.st_size);
-			ft_printf("%s\n", start->direct_name);
-			free(str);
+			ft_printf(str, start->get_stat.st_nlink, start->user_name, start->group_name);
+			ft_strdel(&str);
+			if (S_ISBLK(start->get_stat.st_mode) || S_ISCHR(start->get_stat.st_mode))
+				ft_printf(" %5u, %3u", major(start->get_stat.st_rdev), minor(start->get_stat.st_rdev));
+			else
+			{
+				str = get_bite_param_str(direct);
+				ft_printf(str, start->get_stat.st_size);
+				ft_strdel(&str);
+			}
+			if (ft_ls->flags.t_f.u == 1)
+				str = ctime(&start->get_stat.st_atime);
+			else
+				str = ctime(&start->get_stat.st_mtime);
+			str[ft_strlen(str) - 2] = '\0';
+			ft_printf("%s %s\n", str, start->direct_name);
+			// free(str);
 		}
+		ft_ls->flags.t_f.n_bite = 0;
 		start = start->next;
 	}
 }

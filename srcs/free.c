@@ -33,7 +33,9 @@ void	ft_free_files(t_files *file)
 	while (file)
 	{
 		next = file->next;
-		ft_memdel((void **) &file->direct_name);
+		ft_memdel((void **) &file->data->direct_name);
+		ft_memdel((void **) &file->data->user_name);
+		ft_memdel((void **) &file->data->group_name);
 		ft_memdel((void **) &file);
 		file = next;
 	}

@@ -18,7 +18,7 @@ char	*create_l_param_str(t_dir *direct)
 	char *itoa_tmp;
 	char *tmp;
 
-	str = ft_strdup(" %");
+	str = ft_strdup("  %");
 	itoa_tmp = ft_itoa(direct->link_len);
 	tmp = str;
 	str = ft_strjoin(tmp, itoa_tmp);
@@ -33,7 +33,7 @@ char	*create_l_param_str(t_dir *direct)
 	free(itoa_tmp);
 	free(tmp);
 	tmp = str;
-	str = ft_strjoin(tmp, "s %");
+	str = ft_strjoin(tmp, "s  %");
 	free(tmp);
 	itoa_tmp = ft_itoa(direct->g_name_len);
 	tmp = str;
@@ -68,20 +68,20 @@ void	print_permissions(t_files *file)
 {
 	char	type;
 
-	type = S_ISLNK(file->get_stat.st_mode) ? 'l' : '-';
-	type = S_ISDIR(file->get_stat.st_mode) ? 'd' : type;
-	type = S_ISCHR(file->get_stat.st_mode) ? 'c' : type;
-	type = S_ISBLK(file->get_stat.st_mode) ? 'b' : type;
+	type = S_ISDIR(file->data->get_lstat.st_mode) ? 'd' : '-';
+	type = S_ISLNK(file->data->get_lstat.st_mode) ? 'l' : type;
+	type = S_ISCHR(file->data->get_lstat.st_mode) ? 'c' : type;
+	type = S_ISBLK(file->data->get_lstat.st_mode) ? 'b' : type;
 	ft_printf("%c%c%c%c%c%c%c%c%c%c", type,
-	(file->get_stat.st_mode & S_IRUSR) ? 'r' : '-',
-	(file->get_stat.st_mode & S_IWUSR) ? 'w' : '-',
-	(file->get_stat.st_mode & S_IXUSR) ? 'x' : '-',
-	(file->get_stat.st_mode & S_IRGRP) ? 'r' : '-',
-	(file->get_stat.st_mode & S_IWGRP) ? 'w' : '-',
-	(file->get_stat.st_mode & S_IXGRP) ? 'x' : '-',
-	(file->get_stat.st_mode & S_IROTH) ? 'r' : '-',
-	(file->get_stat.st_mode & S_IWOTH) ? 'w' : '-',
-	(file->get_stat.st_mode & S_IXOTH) ? 'x' : '-');
+	(file->data->get_lstat.st_mode & S_IRUSR) ? 'r' : '-',
+	(file->data->get_lstat.st_mode & S_IWUSR) ? 'w' : '-',
+	(file->data->get_lstat.st_mode & S_IXUSR) ? 'x' : '-',
+	(file->data->get_lstat.st_mode & S_IRGRP) ? 'r' : '-',
+	(file->data->get_lstat.st_mode & S_IWGRP) ? 'w' : '-',
+	(file->data->get_lstat.st_mode & S_IXGRP) ? 'x' : '-',
+	(file->data->get_lstat.st_mode & S_IROTH) ? 'r' : '-',
+	(file->data->get_lstat.st_mode & S_IWOTH) ? 'w' : '-',
+	(file->data->get_lstat.st_mode & S_IXOTH) ? 'x' : '-');
 }
 
 void	print_l(t_files *file, t_ls *ft_ls, int count, t_dir *direct)
@@ -94,28 +94,30 @@ void	print_l(t_files *file, t_ls *ft_ls, int count, t_dir *direct)
 	ft_printf("total %i\n", direct->total);
 	while (start)
 	{
-		if ((start->direct_name[0] == '.'\
-				&& ft_ls->flags.t_f.a == 1) || start->direct_name[0] != '.')
+		if ((start->data->direct_name[0] == '.'\
+				&& ft_ls->flags.t_f.a == 1) || start->data->direct_name[0] != '.')
 		{
 			print_permissions(start);
 			str = create_l_param_str(direct);
-			ft_printf(str, start->get_stat.st_nlink, start->user_name, start->group_name);
+			ft_printf(str, start->data->get_stat.st_nlink, start->data->user_name, start->data->group_name);
 			ft_strdel(&str);
-			if (S_ISBLK(start->get_stat.st_mode) || S_ISCHR(start->get_stat.st_mode))
-				ft_printf(" %5u, %3u", major(start->get_stat.st_rdev), minor(start->get_stat.st_rdev));
+			if (S_ISBLK(start->data->get_stat.st_mode) || S_ISCHR(start->data->get_stat.st_mode))
+			{
+				ft_printf(" %5u, %3u", major(start->data->get_stat.st_rdev), minor(start->data->get_stat.st_rdev));
+			}
 			else
 			{
 				str = get_bite_param_str(direct);
-				ft_printf(str, start->get_stat.st_size);
+				ft_printf(str, start->data->get_stat.st_size);
 				ft_strdel(&str);
 			}
 			if (ft_ls->flags.t_f.u == 1)
-				str = ctime(&start->get_stat.st_atime);
+				str = ctime(&start->data->get_stat.st_atime);
 			else
-				str = ctime(&start->get_stat.st_mtime);
-			str[ft_strlen(str) - 2] = '\0';
-			ft_printf("%s %s\n", str, start->direct_name);
-			// free(str);
+				str = ctime(&start->data->get_stat.st_mtime);
+			str[16] = '\0';
+			ft_printf(" %s %s\n", &str[4], start->data->direct_name);
+			// ft_strdel(&str);
 		}
 		ft_ls->flags.t_f.n_bite = 0;
 		start = start->next;

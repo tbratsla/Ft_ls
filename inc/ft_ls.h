@@ -51,7 +51,7 @@ typedef	struct			s_time
 	time_t				time2;
 }						t_time;
 
-typedef	struct			s_files
+typedef	struct			s_data
 {
 	struct stat			get_stat;
 	struct stat			get_lstat;
@@ -64,12 +64,19 @@ typedef	struct			s_files
 	char				*direct_name;
 	int					type;
 	int					leng;
+}						t_data;
+
+
+typedef	struct			s_files
+{
+	t_data				*data;
 	struct s_files		*next;
 }						t_files;
 
 typedef	struct			s_dir
 {
 	int					count;
+	int					dir;
 	int					total;
 	int					vis_count;
 	int					link_len;
@@ -101,6 +108,8 @@ void					print_error(int flag, char *message);
 */
 
 void					parsing_arg(t_ls *ft_ls, int ac, char **av);
+int						check_file(char *av);
+char					*get_short_name(char *str);
 
 /*
 **	Debug functions

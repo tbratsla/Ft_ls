@@ -14,30 +14,32 @@
 
 void	svap_file(t_files *file1, t_files *file2)
 {
-	int			info;
-	int			leng;
-	int			type;
-	char		*name;
-	struct stat	stat;
+	t_data *tmp;
 
-	info = file1->info;
-	leng = file1->leng;
-	type = file1->type;
-	name = file1->direct_name;
-	stat = file1->get_stat;
-	file1->info = file2->info;
-	file1->leng = file2->leng;
-	file1->type = file2->type;
-	file1->direct_name = file2->direct_name;
-	file1->get_stat = file2->get_stat;
-	file2->info = info;
-	file2->leng = leng;
-	file2->type = type;
-	file2->direct_name = name;
-	file2->get_stat = stat;
-	stat = file1->get_lstat;
-	file1->get_lstat = file2->get_lstat;
-	file2->get_lstat = stat;
+	tmp = file1->data;
+	file1->data = file2->data;
+	file2->data = tmp; 
+}
+
+t_files *sort_rev_file(t_files **begin)
+{
+
+	t_files	*tmp_path;
+	t_files	*tmp_prev;
+	t_files	*tmp_next;
+
+	tmp_path = *begin;
+	tmp_prev = NULL;
+	tmp_next = NULL;
+	while (tmp_path)
+	{
+		tmp_next = tmp_path->next;
+		tmp_path->next = tmp_prev;
+		tmp_prev = tmp_path;
+		tmp_path = tmp_next;
+	}
+	*begin = tmp_prev;
+
 }
 
 t_files	*sort_rev_alp_file(t_files *file)
@@ -47,7 +49,7 @@ t_files	*sort_rev_alp_file(t_files *file)
 	start = file;
 	while (file->next)
 	{
-		if (ft_strcmp(file->direct_name, file->next->direct_name) < 0)
+		if (ft_strcmp(file->data->direct_name, file->next->data->direct_name) < 0)
 		{
 			svap_file(file, file->next);
 			file = start;
@@ -62,17 +64,20 @@ t_files	*sort_rev_alp_file(t_files *file)
 t_files	*sort_alp_file(t_files *file)
 {
 	t_files *start;
+	int		i;
 
 	start = file;
+	i = 0;
 	while (file->next)
 	{
-		if (ft_strcmp(file->direct_name, file->next->direct_name) > 0)
+		if (ft_strcmp(file->data->direct_name, file->next->data->direct_name) > 0)
 		{
 			svap_file(file, file->next);
 			file = start;
 		}
 		else
 			file = file->next;
+		i++;
 	}
 	file = start;
 	return (file);
@@ -86,8 +91,8 @@ t_files	*sort_time_file(t_files *file)
 	start = file;
 	while (file->next)
 	{
-		time.time1 = file->get_stat.st_mtime;
-		time.time2 = file->next->get_stat.st_mtime;
+		time.time1 = file->data->get_stat.st_mtime;
+		time.time2 = file->next->data->get_stat.st_mtime;
 		if (time.time1 < time.time2)
 		{
 			svap_file(file, file->next);

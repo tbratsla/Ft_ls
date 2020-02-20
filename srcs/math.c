@@ -14,9 +14,13 @@
 
 int		max_div(int a, int b)
 {
-	if (a % b == 0)
-		return (a / b);
-	return (a / b + 1);
+	if (b != 0)
+	{
+		if (a % b == 0)
+			return (a / b);
+		return (a / b + 1);
+	}
+	return (a);
 }
 
 int		count_str_len(int max_len)
@@ -53,9 +57,9 @@ char	**get_double_str(t_files *file, int count)
 	i = 0;
 	while (start)
 	{
-		if (start->direct_name[0] != '.')
+		if (start->data->direct_name[0] != '.')
 		{
-			str[i] = ft_strdup(start->direct_name);
+			str[i] = ft_strdup(start->data->direct_name);
 			i++;
 		}
 		start = start->next;

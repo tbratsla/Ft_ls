@@ -12,7 +12,7 @@
 
 #include "../inc/ft_ls.h"
 
-void	check_file(char *av)
+int		check_file(char *av)
 {
 	DIR		*dir;
 	char	*tmp;
@@ -20,19 +20,22 @@ void	check_file(char *av)
 	dir = opendir(av);
 	if (!dir)
 	{
-		tmp = ft_strjoin("ft_ls: ", av);
+		tmp = get_short_name(av);
+		tmp = ft_strjoin("ft_ls: ", tmp);
 		perror(tmp);
 		free(tmp);
-		exit(1);
+		return (0);
 	}
 	closedir(dir);
+	return (1);
 }
 
 t_dir	*get_filename(t_dir *files, char *av)
 {
 	t_dir	*start;
 
-	check_file(av);
+	if (!check_file(av))
+		exit(0);
 	if (!files)
 	{
 		files = (t_dir *)ft_memalloc(sizeof(t_dir));

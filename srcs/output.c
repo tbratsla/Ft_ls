@@ -46,7 +46,7 @@ void	print_output_list(t_files *file, int words, int count, t_ls *ft_ls)
 	while (i < words)
 	{
 		if (start)
-			ft_printf(ft_ls->str, start->direct_name);
+			ft_printf(ft_ls->str, start->data->direct_name);
 		j = 0;
 		while (j < max_div(count, words) && start)
 		{
@@ -94,7 +94,6 @@ void	print_file(t_files *file, t_ls *ft_ls, int max_len, int count)
 	t_files *begin;
 	int		words_in_str;
 
-	count = count + 1;
 	words_in_str = count_word_in_str(ft_ls, max_len, count);
 	ft_ls->str = create_param_str(ft_ls->str, max_len);
 	begin = file;
@@ -104,10 +103,10 @@ void	print_file(t_files *file, t_ls *ft_ls, int max_len, int count)
 	{
 		while (file)
 		{
-			if ((file->direct_name[0] == '.'\
-				&& ft_ls->flags.t_f.a == 1) || file->direct_name[0] != '.')
+			if ((file->data->direct_name[0] == '.'\
+				&& ft_ls->flags.t_f.a == 1) || file->data->direct_name[0] != '.')
 			{
-				ft_printf(ft_ls->str, file->direct_name);
+				ft_printf(ft_ls->str, file->data->direct_name);
 			}
 			file = file->next;
 		}

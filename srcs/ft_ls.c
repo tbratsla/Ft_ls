@@ -12,6 +12,20 @@
 
 #include "../inc/ft_ls.h"
 
+char	*get_short_name(char *str)
+{
+	int i;
+
+	i = ft_strlen(str) - 1;
+	while (i > - 1 && str[i] != '/')
+		i--;
+	if (i == -1)
+		return (str);
+	return (&str[i + 1]);
+}
+
+
+
 void	calc_sizes(t_files *file, t_dir *direct)
 {
 	int	i;
@@ -19,11 +33,11 @@ void	calc_sizes(t_files *file, t_dir *direct)
 	int	size;
 	int len;
 
-	size = file->get_stat.st_size;
-	link = file->get_stat.st_nlink;
-	len = ft_strlen(file->user_name);
+	size = file->data->get_stat.st_size;
+	link = file->data->get_stat.st_nlink;
+	len = ft_strlen(file->data->user_name);
 	direct->u_name_len = len > direct->u_name_len ? len : direct->u_name_len;
-	len = ft_strlen(file->group_name);
+	len = ft_strlen(file->data->group_name);
 	direct->g_name_len = len > direct->g_name_len ? len : direct->g_name_len;
 	i = 1;
 	while (link /= 10)
@@ -46,21 +60,28 @@ t_dir	*add_new_direct(t_dir *direct, t_files *file, t_ls *ft_ls)
 	next = start->next;
 	while (file)
 	{
-		if (!ft_strcmp(file->direct_name, ".") || !ft_strcmp(file->direct_name, ".."))
+		if (!ft_strcmp(file->data->direct_name, ".") || !ft_strcmp(file->data->direct_name, ".."))
 		{
 			file = file->next;
 			continue ;
 		}
-		if (ft_ls->flags.t_f.a == 0 && file->direct_name[0] == '.')
+		if (ft_ls->flags.t_f.a == 0 && file->data->direct_name[0] == '.')
+		{
+			file = file->next;
+			continue ;
+		}
+		if (S_ISLNK(file->data->get_lstat.st_mode))
 		{
 			file = file->next;
 			continue ;
 		}
 		start->next = ft_memalloc(sizeof(t_dir));
 		start = start->next;
+		if (S_ISDIR(file->data->get_lstat.st_mode))
+			start->dir = 1;	
 		start->filename = ft_strjoin(direct->filename, "/");
 		tmp = start->filename;
-		start->filename = ft_strjoin(tmp, file->direct_name);
+		start->filename = ft_strjoin(tmp, file->data->direct_name);
 		ft_strdel(&tmp);
 		file = file->next;
 	}
@@ -73,30 +94,31 @@ void	set_file_params(t_files *files, struct dirent *entry, t_dir *direct, t_ls *
 	char	*tmp;
 	char	*tmp1;
 
-	files->info = entry->d_ino;
-	files->direct_name = ft_strdup(entry->d_name);
-	files->type = entry->d_type;
-	files->leng = entry->d_reclen;
+	files->data->info = entry->d_ino;
+	files->data->direct_name = ft_strdup(entry->d_name);
+	files->data->type = entry->d_type;
+	files->data->leng = entry->d_reclen;
 	files->next = NULL;
 	tmp = ft_strjoin(direct->filename, "/");
-	tmp1 = ft_strjoin(tmp, files->direct_name);
-	stat(tmp1, &files->get_stat);
-	lstat(tmp1, &files->get_lstat);
-	files->passwd = getpwuid(files->get_stat.st_uid);
-	files->group = getgrgid(files->get_stat.st_gid);
-	if ((files->direct_name[0] == '.'\
-				&& ft_ls->flags.t_f.a == 1) || files->direct_name[0] != '.')
+	tmp1 = ft_strjoin(tmp, files->data->direct_name);
+	stat(tmp1, &files->data->get_stat);
+	lstat(tmp1, &files->data->get_lstat);
+	files->data->passwd = getpwuid(files->data->get_lstat.st_uid);
+	files->data->group = getgrgid(files->data->get_lstat.st_gid);
+	if ((files->data->direct_name[0] == '.'\
+				&& ft_ls->flags.t_f.a == 1) || files->data->direct_name[0] != '.')
 	{
-		direct->total += files->get_lstat.st_blocks;
+		direct->total += files->data->get_lstat.st_blocks;
 	}
-	files->user_name = ft_strdup(files->passwd->pw_name);
-	files->group_name = ft_strdup(files->group->gr_name);
+	files->data->user_name = ft_strdup(files->data->passwd->pw_name);
+	files->data->group_name = ft_strdup(files->data->group->gr_name);
+	// ft_printf("%15s %15s %15s\n", files->data->user_name, files->data->group_name, files->data->direct_name);
 	calc_sizes(files, direct);
-	// acl(tmp1, GETACL, 1, files->aclbufp);
+	// acl(tmp1, GETACL, 1, files->data->aclbufp);
 	free(tmp);
 	free(tmp1);
-	if (direct->max_len < (int)ft_strlen(files->direct_name))
-		direct->max_len = ft_strlen(files->direct_name);
+	if (direct->max_len < (int)ft_strlen(files->data->direct_name))
+		direct->max_len = ft_strlen(files->data->direct_name);
 }
 
 t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct, t_ls *ft_ls)
@@ -109,7 +131,8 @@ t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct, t_ls
 		direct->count = 0;
 		direct->vis_count = 0;
 		files = (t_files *)ft_memalloc(sizeof(t_files));
-		files->num = 0;
+		files->data = ft_memalloc(sizeof(t_data));
+		files->data->num = 0;
 		set_file_params(files, entry, direct, ft_ls);
 		return (files);
 	}
@@ -121,11 +144,13 @@ t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct, t_ls
 			direct->vis_count++;
 		while (files->next)
 			files = files->next;
-		i = files->num + 1;
+		i = files->data->num + 1;
 		files->next = (t_files *)ft_memalloc(sizeof(t_files));
 		files = files->next;
+		files->data = ft_memalloc(sizeof(t_data));
 		set_file_params(files, entry, direct, ft_ls);
-		files->num = i;
+		files->data->num = i;
+		files->next = NULL;
 		files = start;
 		return (files);
 	}
@@ -138,6 +163,7 @@ void	read_by_filename(t_ls *ft_ls)
 	struct dirent	*entry;
 	t_dir			*direct;
 	t_files			*file;
+	char			*tmp;
 
 	direct = ft_ls->dir;
 	while (direct)
@@ -146,18 +172,25 @@ void	read_by_filename(t_ls *ft_ls)
 		dir = opendir(direct->filename);
 		if (!dir)
 		{
+			if (direct->dir == 1)
+			{
+				tmp = get_short_name(direct->filename);
+				tmp = ft_strjoin("ft_ls: ", tmp);
+				perror(tmp);
+				free(tmp);
+			}
 			direct = direct->next;
 			continue ;
 		}
 		file = direct->files;
 		while ((entry = readdir(dir)) != NULL)
 			file = add_new_file(file, entry, direct, ft_ls);
-		if (ft_ls->flags.t_f.r == 1)
-			file = sort_rev_alp_file(file);
-		else if (ft_ls->flags.t_f.t == 1)
+		if (ft_ls->flags.t_f.t == 1)
 			file = sort_time_file(file);
 		else
 			file = sort_alp_file(file);
+		if (ft_ls->flags.t_f.r == 1)
+			file = sort_rev_file(&file);
 		if (ft_ls->flags.t_f.big_r == 1)
 			direct = add_new_direct(direct, file, ft_ls);
 		if (ft_ls->flags.t_f.big_r == 1 && ft_strcmp(direct->filename, "."))
@@ -193,5 +226,6 @@ int		main(int ac, char **av)
 	parsing_arg(ft_ls, ac, av);
 	read_by_filename(ft_ls);
 	free(ft_ls);
+	// system("leaks -q ft_ls");
 	return (0);
 }

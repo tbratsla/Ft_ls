@@ -33,8 +33,8 @@ void	calc_sizes(t_files *file, t_dir *direct)
 	int	size;
 	int len;
 
-	size = file->data->get_stat.st_size;
-	link = file->data->get_stat.st_nlink;
+	size = file->data->get_lstat.st_size;
+	link = file->data->get_lstat.st_nlink;
 	len = ft_strlen(file->data->user_name);
 	direct->u_name_len = len > direct->u_name_len ? len : direct->u_name_len;
 	len = ft_strlen(file->data->group_name);
@@ -101,7 +101,6 @@ void	set_file_params(t_files *files, struct dirent *entry, t_dir *direct, t_ls *
 	files->next = NULL;
 	tmp = ft_strjoin(direct->filename, "/");
 	tmp1 = ft_strjoin(tmp, files->data->direct_name);
-	stat(tmp1, &files->data->get_stat);
 	lstat(tmp1, &files->data->get_lstat);
 	files->data->passwd = getpwuid(files->data->get_lstat.st_uid);
 	files->data->group = getgrgid(files->data->get_lstat.st_gid);
@@ -112,13 +111,13 @@ void	set_file_params(t_files *files, struct dirent *entry, t_dir *direct, t_ls *
 	}
 	files->data->user_name = ft_strdup(files->data->passwd->pw_name);
 	files->data->group_name = ft_strdup(files->data->group->gr_name);
-	// ft_printf("%15s %15s %15s\n", files->data->user_name, files->data->group_name, files->data->direct_name);
 	calc_sizes(files, direct);
-	// acl(tmp1, GETACL, 1, files->data->aclbufp);
 	free(tmp);
 	free(tmp1);
-	if (direct->max_len < (int)ft_strlen(files->data->direct_name))
-		direct->max_len = ft_strlen(files->data->direct_name);
+	if ((files->data->direct_name[0] == '.'\
+				&& ft_ls->flags.t_f.a == 1) || files->data->direct_name[0] != '.')
+		if (direct->max_len < (int)ft_strlen(files->data->direct_name))
+			direct->max_len = ft_strlen(files->data->direct_name);
 }
 
 t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct, t_ls *ft_ls)
@@ -157,6 +156,31 @@ t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct, t_ls
 	return (files);
 }
 
+void	sort_files(t_ls *ft_ls, t_files *file)
+{
+	if (ft_ls->flags.t_f.t == 1)
+		file = sort_time_file(file);
+	else
+		file = sort_alp_file(file);
+	if (ft_ls->flags.t_f.r == 1)
+		file = sort_rev_file(&file);
+}
+
+void	sort_and_print_files(t_ls *ft_ls, t_dir *direct, t_files *file)
+{
+	sort_files(ft_ls, file);
+	if (ft_ls->flags.t_f.big_r == 1)
+		direct = add_new_direct(direct, file, ft_ls);
+	if ((ft_ls->flags.t_f.big_r == 1 && ft_strcmp(direct->filename, ".")) || ft_ls->flags.t_f.print == 1)
+		ft_printf("\n%s:\n", direct->filename);
+	if (ft_ls->flags.t_f.l == 0)
+		print_file(file, ft_ls, direct->max_len,\
+		ft_ls->flags.t_f.a == 1 ? direct->count : direct->vis_count);
+	else
+		print_l(file, ft_ls,\
+		ft_ls->flags.t_f.a == 1 ? direct->count : direct->vis_count, direct);
+}
+
 void	read_by_filename(t_ls *ft_ls)
 {
 	DIR				*dir;
@@ -185,22 +209,7 @@ void	read_by_filename(t_ls *ft_ls)
 		file = direct->files;
 		while ((entry = readdir(dir)) != NULL)
 			file = add_new_file(file, entry, direct, ft_ls);
-		if (ft_ls->flags.t_f.t == 1)
-			file = sort_time_file(file);
-		else
-			file = sort_alp_file(file);
-		if (ft_ls->flags.t_f.r == 1)
-			file = sort_rev_file(&file);
-		if (ft_ls->flags.t_f.big_r == 1)
-			direct = add_new_direct(direct, file, ft_ls);
-		if (ft_ls->flags.t_f.big_r == 1 && ft_strcmp(direct->filename, "."))
-			ft_printf("\n%s:\n", direct->filename);
-		if (ft_ls->flags.t_f.l == 0)
-			print_file(file, ft_ls, direct->max_len,\
-				ft_ls->flags.t_f.a == 1 ? direct->count : direct->vis_count);
-		else
-			print_l(file, ft_ls,\
-				ft_ls->flags.t_f.a == 1 ? direct->count : direct->vis_count, direct);
+		sort_and_print_files(ft_ls, direct, file);
 		closedir(dir);
 		ft_free_files(file);
 		direct = direct->next;

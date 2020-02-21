@@ -94,6 +94,7 @@ void	print_file(t_files *file, t_ls *ft_ls, int max_len, int count)
 	t_files *begin;
 	int		words_in_str;
 
+	ft_ls->flags.t_f.print = 1;
 	words_in_str = count_word_in_str(ft_ls, max_len, count);
 	ft_ls->str = create_param_str(ft_ls->str, max_len);
 	begin = file;

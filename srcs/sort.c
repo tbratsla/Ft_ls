@@ -39,7 +39,7 @@ t_files *sort_rev_file(t_files **begin)
 		tmp_path = tmp_next;
 	}
 	*begin = tmp_prev;
-
+	return (*begin);
 }
 
 t_files	*sort_rev_alp_file(t_files *file)
@@ -91,8 +91,8 @@ t_files	*sort_time_file(t_files *file)
 	start = file;
 	while (file->next)
 	{
-		time.time1 = file->data->get_stat.st_mtime;
-		time.time2 = file->next->data->get_stat.st_mtime;
+		time.time1 = file->data->get_lstat.st_mtime;
+		time.time2 = file->next->data->get_lstat.st_mtime;
 		if (time.time1 < time.time2)
 		{
 			svap_file(file, file->next);

@@ -105,7 +105,8 @@ void	print_file(t_files *file, t_ls *ft_ls, int max_len, int count)
 		while (file)
 		{
 			if ((file->data->direct_name[0] == '.'\
-				&& ft_ls->flags.t_f.a == 1) || file->data->direct_name[0] != '.')
+				&& ft_ls->flags.t_f.a == 1) ||\
+				file->data->direct_name[0] != '.')
 			{
 				ft_printf(ft_ls->str, file->data->direct_name);
 			}

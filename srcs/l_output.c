@@ -12,6 +12,25 @@
 
 #include "../inc/ft_ls.h"
 
+char	*create_l_param_str_2(char *str, t_dir *direct)
+{
+	char *itoa_tmp;
+	char *tmp;
+
+	tmp = str;
+	str = ft_strjoin(tmp, "s  %");
+	free(tmp);
+	itoa_tmp = ft_itoa(direct->g_name_len);
+	tmp = str;
+	str = ft_strjoin(tmp, itoa_tmp);
+	free(itoa_tmp);
+	free(tmp);
+	tmp = str;
+	str = ft_strjoin(tmp, "s");
+	free(tmp);
+	return (str);
+}
+
 char	*create_l_param_str(t_dir *direct)
 {
 	char *str;
@@ -32,94 +51,8 @@ char	*create_l_param_str(t_dir *direct)
 	str = ft_strjoin(tmp, itoa_tmp);
 	free(itoa_tmp);
 	free(tmp);
-	tmp = str;
-	str = ft_strjoin(tmp, "s  %");
-	free(tmp);
-	itoa_tmp = ft_itoa(direct->g_name_len);
-	tmp = str;
-	str = ft_strjoin(tmp, itoa_tmp);
-	free(itoa_tmp);
-	free(tmp);
-	tmp = str;
-	str = ft_strjoin(tmp, "s");
-	free(tmp);
+	str = create_l_param_str_2(str, direct);
 	return (str);
-}
-
-char	*ft_get_time(t_files *start, t_ls *ft_ls)
-{
-	time_t t;
-	char	*str;
-	char	*tmp;
-
-	t = time(&t);
-	if (ft_ls->flags.t_f.u == 1)
-	{
-		if (t - start->data->get_lstat.st_atime < 15778463)
-		{
-			str = ft_strdup(ctime(&start->data->get_lstat.st_atime));
-			str[16] = '\0';
-		}
-		else
-		{
-			str = ctime(&start->data->get_lstat.st_atime);
-			tmp = &str[20];
-			tmp[4] = '\0';
-			str[11] = ' ';
-			str[12] = '\0';
-			str = ft_strjoin(str, tmp);
-		}
-	}
-	else
-	{
-		if (t - start->data->get_lstat.st_mtime < 15778463)
-		{
-			str = ft_strdup(ctime(&start->data->get_lstat.st_mtime));
-			str[16] = '\0';
-		}
-		else
-		{
-			str = ctime(&start->data->get_lstat.st_mtime);
-			tmp = &str[20];
-			tmp[4] = '\0';
-			str[11] = ' ';
-			str[12] = '\0';
-			str = ft_strjoin(str, tmp);
-		}
-	}
-	return (str);
-}
-
-char	*get_bite_param_str(t_dir *direct)
-{
-	char *tmp;
-	char *itoa;
-	char *str;
-
-	str = ft_strdup(" %");
-	tmp = str;
-	itoa = ft_itoa(direct->bite_size_len);
-	str = ft_strjoin(tmp, itoa);
-	free(tmp);
-	free(itoa);
-	tmp = str;
-	str = ft_strjoin(tmp, "i");
-	free(tmp);
-	return (str);
-}
-
-void	ft_get_link(t_dir *direct, t_files *start, char *str)
-{
-	char *tmp;
-	char *link;
-	static char buff[512];
-
-	link = ft_strjoin(direct->filename, "/");
-	tmp = ft_strjoin(link, start->data->direct_name);
-	free(link);
-	readlink(tmp, buff, sizeof(buff));
-	free(tmp);
-	ft_printf(" %s %s -> %s\n", &str[4], start->data->direct_name, buff);
 }
 
 void	print_permissions(t_files *file)
@@ -142,12 +75,36 @@ void	print_permissions(t_files *file)
 	(file->data->get_lstat.st_mode & S_IXOTH) ? 'x' : '-');
 }
 
+void	print_second_l(t_files *start, t_ls *ft_ls, t_dir *direct, char *str)
+{
+	print_permissions(start);
+	str = create_l_param_str(direct);
+	ft_printf(str, start->data->get_lstat.st_nlink,\
+	start->data->user_name, start->data->group_name);
+	ft_strdel(&str);
+	if (S_ISBLK(start->data->get_lstat.st_mode)\
+		|| S_ISCHR(start->data->get_lstat.st_mode))
+		ft_printf(" %5u, %3u", major(start->data->get_lstat.st_rdev),\
+			minor(start->data->get_lstat.st_rdev));
+	else
+	{
+		str = get_bite_param_str(direct);
+		ft_printf(str, start->data->get_lstat.st_size);
+		ft_strdel(&str);
+	}
+	str = ft_get_time(start, ft_ls);
+	if (S_ISLNK(start->data->get_lstat.st_mode))
+		ft_get_link(direct, start, str);
+	else
+		ft_printf(" %s %s\n", &str[4], start->data->direct_name);
+}
+
 void	print_l(t_files *file, t_ls *ft_ls, int count, t_dir *direct)
 {
 	t_files *start;
 	char	*str;
-	// char	*time[6];
 
+	str = NULL;
 	ft_ls->flags.t_f.print = 1;
 	start = file;
 	count++;
@@ -156,29 +113,8 @@ void	print_l(t_files *file, t_ls *ft_ls, int count, t_dir *direct)
 	while (start)
 	{
 		if ((start->data->direct_name[0] == '.'\
-				&& ft_ls->flags.t_f.a == 1) || start->data->direct_name[0] != '.')
-		{
-			print_permissions(start);
-			str = create_l_param_str(direct);
-			ft_printf(str, start->data->get_lstat.st_nlink, start->data->user_name, start->data->group_name);
-			ft_strdel(&str);
-			if (S_ISBLK(start->data->get_lstat.st_mode) || S_ISCHR(start->data->get_lstat.st_mode))
-			{
-				ft_printf(" %5u, %3u", major(start->data->get_lstat.st_rdev), minor(start->data->get_lstat.st_rdev));
-			}
-			else
-			{
-				str = get_bite_param_str(direct);
-				ft_printf(str, start->data->get_lstat.st_size);
-				ft_strdel(&str);
-			}
-			str = ft_get_time(start, ft_ls);
-			if (S_ISLNK(start->data->get_lstat.st_mode))
-				ft_get_link(direct, start, str);
-			else
-				ft_printf(" %s %s\n", &str[4], start->data->direct_name);
-			// ft_strdel(&str);
-		}
+		&& ft_ls->flags.t_f.a == 1) || start->data->direct_name[0] != '.')
+			print_second_l(start, ft_ls, direct, str);
 		ft_ls->flags.t_f.n_bite = 0;
 		start = start->next;
 	}

@@ -25,7 +25,7 @@
 # include <pwd.h>
 # include <grp.h>
 
-typedef	union			s_flags
+typedef	union			u_flags
 {
 	short				flag;
 	struct				s_f
@@ -67,7 +67,6 @@ typedef	struct			s_data
 	int					leng;
 }						t_data;
 
-
 typedef	struct			s_files
 {
 	t_data				*data;
@@ -90,7 +89,7 @@ typedef	struct			s_dir
 	struct s_dir		*next;
 }						t_dir;
 
-typedef struct			s_ls 
+typedef struct			s_ls
 {
 	struct winsize		win;
 	char				*str;
@@ -102,7 +101,7 @@ typedef struct			s_ls
 **	Error functions
 */
 
-void					print_error(int flag, char *message);
+void					print_error(int flag, char *message, t_ls *ft_ls);
 
 /*
 **	Parse functions
@@ -111,6 +110,7 @@ void					print_error(int flag, char *message);
 void					parsing_arg(t_ls *ft_ls, int ac, char **av);
 int						check_file(char *av);
 char					*get_short_name(char *str);
+t_dir					*get_filename(t_dir *files, char *av, t_dir **direct);
 
 /*
 **	Debug functions
@@ -122,19 +122,31 @@ void					print_direct(t_dir *direct);
 **	Output functions
 */
 
-void					print_file(t_files *file, t_ls *ft_ls, int max_len, int count);
-void					print_l(t_files *file, t_ls *ft_ls, int count, t_dir *direct);
+void					print_file(t_files *file, t_ls *ft_ls,\
+						int max_len, int count);
+void					print_l(t_files *file, t_ls *ft_ls,\
+						int count, t_dir *direct);
+
+/*
+**	Get functions
+*/
+
+void					ft_get_link(t_dir *direct,\
+						t_files *start, char *str);
+char					*get_bite_param_str(t_dir *direct);
+char					*ft_get_time(t_files *start, t_ls *ft_ls);
 
 /*
 **	Sort functions
 */
 
-void					sort_and_print_files(t_ls *ft_ls, t_dir *direct, t_files *file);
+void					sort_and_print_files(t_ls *ft_ls,\
+						t_dir *direct, t_files *file);
 t_files					*sort_alp_file(t_files *file);
-t_files					*sort_rev_alp_file(t_files *file);
 t_files					*sort_time_file(t_files *file);
 void					svap_file(t_files *file1, t_files *file2);
 t_files					*sort_rev_file(t_files **begin);
+char					**sort_av(int ac, char **av);
 
 /*
 ** Free functions

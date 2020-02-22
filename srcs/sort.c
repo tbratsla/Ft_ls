@@ -18,47 +18,47 @@ void	svap_file(t_files *file1, t_files *file2)
 
 	tmp = file1->data;
 	file1->data = file2->data;
-	file2->data = tmp; 
+	file2->data = tmp;
 }
 
-t_files *sort_rev_file(t_files **begin)
+char	**sort_av(int ac, char **av)
 {
+	int		i;
+	char	*tmp;
 
-	t_files	*tmp_path;
-	t_files	*tmp_prev;
-	t_files	*tmp_next;
-
-	tmp_path = *begin;
-	tmp_prev = NULL;
-	tmp_next = NULL;
-	while (tmp_path)
+	i = 1;
+	while (i < ac)
 	{
-		tmp_next = tmp_path->next;
-		tmp_path->next = tmp_prev;
-		tmp_prev = tmp_path;
-		tmp_path = tmp_next;
-	}
-	*begin = tmp_prev;
-	return (*begin);
-}
-
-t_files	*sort_rev_alp_file(t_files *file)
-{
-	t_files *start;
-
-	start = file;
-	while (file->next)
-	{
-		if (ft_strcmp(file->data->direct_name, file->next->data->direct_name) < 0)
+		if (i + 1 < ac && ft_strcmp(av[i], av[i + 1]) > 0)
 		{
-			svap_file(file, file->next);
-			file = start;
+			tmp = av[i];
+			av[i] = av[i + 1];
+			av[i + 1] = tmp;
+			i = 1;
 		}
 		else
-			file = file->next;
+			i++;
 	}
-	file = start;
-	return (file);
+	return (av);
+}
+
+t_files	*sort_rev_file(t_files **alst)
+{
+	t_files	*prev;
+	t_files	*cur;
+	t_files	*next;
+
+	prev = NULL;
+	cur = *alst;
+	while (cur != NULL)
+	{
+		next = cur->next;
+		cur->next = prev;
+		prev = cur;
+		cur = next;
+	}
+	*alst = prev;
+	return (*alst);
 }
 
 t_files	*sort_alp_file(t_files *file)
@@ -70,7 +70,8 @@ t_files	*sort_alp_file(t_files *file)
 	i = 0;
 	while (file->next)
 	{
-		if (ft_strcmp(file->data->direct_name, file->next->data->direct_name) > 0)
+		if (ft_strcmp(file->data->direct_name,\
+			file->next->data->direct_name) > 0)
 		{
 			svap_file(file, file->next);
 			file = start;

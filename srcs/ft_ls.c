@@ -17,14 +17,12 @@ char	*get_short_name(char *str)
 	int i;
 
 	i = ft_strlen(str) - 1;
-	while (i > - 1 && str[i] != '/')
+	while (i > -1 && str[i] != '/')
 		i--;
 	if (i == -1)
 		return (str);
 	return (&str[i + 1]);
 }
-
-
 
 void	calc_sizes(t_files *file, t_dir *direct)
 {
@@ -46,8 +44,8 @@ void	calc_sizes(t_files *file, t_dir *direct)
 	i = 1;
 	while (size /= 10)
 		i++;
-	direct->bite_size_len = i > direct->bite_size_len ? i : direct->bite_size_len;
-
+	direct->bite_size_len = i >\
+	direct->bite_size_len ? i : direct->bite_size_len;
 }
 
 t_dir	*add_new_direct(t_dir *direct, t_files *file, t_ls *ft_ls)
@@ -55,22 +53,15 @@ t_dir	*add_new_direct(t_dir *direct, t_files *file, t_ls *ft_ls)
 	t_dir	*start;
 	t_dir	*next;
 	char	*tmp;
- 
+
 	start = direct;
 	next = start->next;
 	while (file)
 	{
-		if (!ft_strcmp(file->data->direct_name, ".") || !ft_strcmp(file->data->direct_name, ".."))
-		{
-			file = file->next;
-			continue ;
-		}
-		if (ft_ls->flags.t_f.a == 0 && file->data->direct_name[0] == '.')
-		{
-			file = file->next;
-			continue ;
-		}
-		if (S_ISLNK(file->data->get_lstat.st_mode))
+		if (!ft_strcmp(file->data->direct_name, ".")\
+			|| !ft_strcmp(file->data->direct_name, "..") ||\
+			(ft_ls->flags.t_f.a == 0 && file->data->direct_name[0] == '.')\
+			|| S_ISLNK(file->data->get_lstat.st_mode))
 		{
 			file = file->next;
 			continue ;
@@ -78,7 +69,7 @@ t_dir	*add_new_direct(t_dir *direct, t_files *file, t_ls *ft_ls)
 		start->next = ft_memalloc(sizeof(t_dir));
 		start = start->next;
 		if (S_ISDIR(file->data->get_lstat.st_mode))
-			start->dir = 1;	
+			start->dir = 1;
 		start->filename = ft_strjoin(direct->filename, "/");
 		tmp = start->filename;
 		start->filename = ft_strjoin(tmp, file->data->direct_name);
@@ -89,7 +80,8 @@ t_dir	*add_new_direct(t_dir *direct, t_files *file, t_ls *ft_ls)
 	return (direct);
 }
 
-void	set_file_params(t_files *files, struct dirent *entry, t_dir *direct, t_ls *ft_ls)
+void	set_file_params(t_files *files,\
+	struct dirent *entry, t_dir *direct, t_ls *ft_ls)
 {
 	char	*tmp;
 	char	*tmp1;
@@ -105,7 +97,7 @@ void	set_file_params(t_files *files, struct dirent *entry, t_dir *direct, t_ls *
 	files->data->passwd = getpwuid(files->data->get_lstat.st_uid);
 	files->data->group = getgrgid(files->data->get_lstat.st_gid);
 	if ((files->data->direct_name[0] == '.'\
-				&& ft_ls->flags.t_f.a == 1) || files->data->direct_name[0] != '.')
+	&& ft_ls->flags.t_f.a == 1) || files->data->direct_name[0] != '.')
 	{
 		direct->total += files->data->get_lstat.st_blocks;
 	}
@@ -115,12 +107,13 @@ void	set_file_params(t_files *files, struct dirent *entry, t_dir *direct, t_ls *
 	free(tmp);
 	free(tmp1);
 	if ((files->data->direct_name[0] == '.'\
-				&& ft_ls->flags.t_f.a == 1) || files->data->direct_name[0] != '.')
+		&& ft_ls->flags.t_f.a == 1) || files->data->direct_name[0] != '.')
 		if (direct->max_len < (int)ft_strlen(files->data->direct_name))
 			direct->max_len = ft_strlen(files->data->direct_name);
 }
 
-t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct, t_ls *ft_ls)
+t_files		*add_new_file(t_files *files,\
+	struct dirent *entry, t_dir *direct, t_ls *ft_ls)
 {
 	t_files *start;
 	int		i;
@@ -158,12 +151,12 @@ t_files		*add_new_file(t_files *files, struct dirent *entry, t_dir *direct, t_ls
 
 void	sort_files(t_ls *ft_ls, t_files *file)
 {
-	if (ft_ls->flags.t_f.t == 1)
+	if (ft_ls->flags.t_f.t == 1 && ft_ls->flags.t_f.u == 0)
 		file = sort_time_file(file);
 	else
 		file = sort_alp_file(file);
 	if (ft_ls->flags.t_f.r == 1)
-		file = sort_rev_file(&file);
+		sort_rev_file(&file);
 }
 
 void	sort_and_print_files(t_ls *ft_ls, t_dir *direct, t_files *file)
@@ -171,7 +164,9 @@ void	sort_and_print_files(t_ls *ft_ls, t_dir *direct, t_files *file)
 	sort_files(ft_ls, file);
 	if (ft_ls->flags.t_f.big_r == 1)
 		direct = add_new_direct(direct, file, ft_ls);
-	if ((ft_ls->flags.t_f.big_r == 1 && ft_strcmp(direct->filename, ".")) || ft_ls->flags.t_f.print == 1)
+	if (ft_ls->flags.t_f.input == 0 && (((ft_ls->flags.t_f.big_r == 1\
+		&& ft_strcmp(direct->filename, ".")) ||\
+		ft_strcmp(direct->filename, "*")) && ft_ls->flags.t_f.print))
 		ft_printf("\n%s:\n", direct->filename);
 	if (ft_ls->flags.t_f.l == 0)
 		print_file(file, ft_ls, direct->max_len,\
@@ -231,7 +226,6 @@ int		main(int ac, char **av)
 	t_ls *ft_ls;
 
 	ft_ls = init();
-
 	parsing_arg(ft_ls, ac, av);
 	read_by_filename(ft_ls);
 	free(ft_ls);

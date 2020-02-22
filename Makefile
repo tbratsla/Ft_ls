@@ -20,7 +20,9 @@ SRC = 	ft_ls.c		\
 		free.c		\
 		output.c	\
 		math.c		\
-		l_output.c
+		l_output.c	\
+		get_l.c		\
+		parse_input.c
 
 SRC_DIR = srcs
 

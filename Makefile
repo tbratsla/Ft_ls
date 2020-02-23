@@ -32,7 +32,7 @@ SRCS = $(addprefix $(SRC_DIR)/,$(SRC))
 
 OBJS = $(addprefix $(OBJ_DIR)/,$(SRC:.c=.o))
 
-FLAGS = -Wall -Wextra -Werror -fsanitize=address -g
+FLAGS = -Wall -Wextra -Werror #-fsanitize=address -g
 
 PRINTF = ./Libft/ft_printf/libftprintf.a
 

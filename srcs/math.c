@@ -52,7 +52,7 @@ char	**get_double_str(t_files *file, int count)
 	int		i;
 	t_files *start;
 
-	str = ft_memalloc(sizeof(char *) * (count + 1));
+	str = ft_memalloc(sizeof(char *) * (count + 2));
 	start = file;
 	i = 0;
 	while (start)

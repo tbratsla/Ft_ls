@@ -17,12 +17,12 @@ void	free_double_str(char **str, int count)
 	int i;
 
 	i = 0;
-	while (i < count)
+	while (i < count + 2)
 	{
 		ft_memdel((void **)&str[i]);
 		i++;
 	}
-	ft_memdel((void **)str);
+	free(str);
 }
 
 void	ft_free_files(t_files *file)
@@ -36,6 +36,7 @@ void	ft_free_files(t_files *file)
 		ft_memdel((void **)&file->data->direct_name);
 		ft_memdel((void **)&file->data->user_name);
 		ft_memdel((void **)&file->data->group_name);
+		ft_memdel((void **)&file->data);
 		ft_memdel((void **)&file);
 		file = next;
 	}

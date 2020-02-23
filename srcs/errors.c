@@ -15,7 +15,7 @@
 void	print_error(int flag, char *message, t_ls *ft_ls)
 {
 	if (flag == 1)
-		ft_printf("usage: ./ft_ls [-Rlratufgd] [file ...]\n");
+		ft_printf("usage: ./ft_ls [-Rlratufgo] [file ...]\n");
 	if (flag == 2)
 		ft_printf("ft_ls: %s: No such file or directory\n", message);
 	if (flag == 3)

@@ -38,7 +38,7 @@ typedef	union			u_flags
 		unsigned char	u		: 1;
 		unsigned char	f		: 1;
 		unsigned char	g		: 1;
-		unsigned char	d		: 1;
+		unsigned char	o		: 1;
 		unsigned char	file	: 1;
 		unsigned char	n_bite	: 1;
 		unsigned char	input	: 1;
@@ -110,7 +110,7 @@ void					print_error(int flag, char *message, t_ls *ft_ls);
 void					parsing_arg(t_ls *ft_ls, int ac, char **av);
 int						check_file(char *av);
 char					*get_short_name(char *str);
-t_dir					*get_filename(t_dir *files, char *av, t_dir **direct);
+t_dir					*get_filename(t_dir *files, char *av, t_dir **direct, t_ls *ft_ls);
 
 /*
 **	Debug functions
@@ -142,11 +142,11 @@ char					*ft_get_time(t_files *start, t_ls *ft_ls);
 
 void					sort_and_print_files(t_ls *ft_ls,\
 						t_dir *direct, t_files *file);
-t_files					*sort_alp_file(t_files *file);
-t_files					*sort_time_file(t_files *file);
+t_files					*sort_alp_file(t_files *file, t_ls *ft_ls, t_dir *direct);
+t_files					*sort_time_file(t_files *file, t_ls *ft_ls, t_dir *direct);
 void					svap_file(t_files *file1, t_files *file2);
-t_files					*sort_rev_file(t_files **begin);
-char					**sort_av(int ac, char **av);
+void					sort_rev_file(t_files **begin);
+char					**sort_av(int ac, char **av, unsigned char flag);
 
 /*
 ** Free functions
@@ -164,6 +164,6 @@ int						max_div(int a, int b);
 int						count_str_len(int max_len);
 int						count_word_in_str(t_ls *ft_ls, int max_len, int count);
 char					**get_double_str(t_files *file, int count);
-void					calc_sizes(t_files *file, t_dir *direct);
+void					calc_sizes(t_files *file, t_dir *direct, t_ls *ft_ls);
 
 #endif

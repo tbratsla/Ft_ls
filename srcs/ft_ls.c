@@ -24,7 +24,7 @@ char	*get_short_name(char *str)
 	return (&str[i + 1]);
 }
 
-void	calc_sizes(t_files *file, t_dir *direct)
+void	calc_sizes(t_files *file, t_dir *direct, t_ls *ft_ls)
 {
 	int	i;
 	int	link;
@@ -33,9 +33,13 @@ void	calc_sizes(t_files *file, t_dir *direct)
 
 	size = file->data->get_lstat.st_size;
 	link = file->data->get_lstat.st_nlink;
-	len = ft_strlen(file->data->user_name);
+	len = 0;
+	if (file->data->user_name && ft_ls->flags.t_f.g == 0)
+		len = ft_strlen(file->data->user_name);
 	direct->u_name_len = len > direct->u_name_len ? len : direct->u_name_len;
-	len = ft_strlen(file->data->group_name);
+	len = 0;
+	if (file->data->group_name && ft_ls->flags.t_f.o == 0)
+		len = ft_strlen(file->data->group_name);
 	direct->g_name_len = len > direct->g_name_len ? len : direct->g_name_len;
 	i = 1;
 	while (link /= 10)
@@ -94,16 +98,16 @@ void	set_file_params(t_files *files,\
 	tmp = ft_strjoin(direct->filename, "/");
 	tmp1 = ft_strjoin(tmp, files->data->direct_name);
 	lstat(tmp1, &files->data->get_lstat);
-	files->data->passwd = getpwuid(files->data->get_lstat.st_uid);
-	files->data->group = getgrgid(files->data->get_lstat.st_gid);
+	if ((files->data->passwd = getpwuid(files->data->get_lstat.st_uid)))
+		files->data->user_name = ft_strdup(files->data->passwd->pw_name);
+	if ((files->data->group = getgrgid(files->data->get_lstat.st_gid)))
+		files->data->group_name = ft_strdup(files->data->group->gr_name);
 	if ((files->data->direct_name[0] == '.'\
 	&& ft_ls->flags.t_f.a == 1) || files->data->direct_name[0] != '.')
 	{
 		direct->total += files->data->get_lstat.st_blocks;
 	}
-	files->data->user_name = ft_strdup(files->data->passwd->pw_name);
-	files->data->group_name = ft_strdup(files->data->group->gr_name);
-	calc_sizes(files, direct);
+	calc_sizes(files, direct, ft_ls);
 	free(tmp);
 	free(tmp1);
 	if ((files->data->direct_name[0] == '.'\
@@ -149,19 +153,20 @@ t_files		*add_new_file(t_files *files,\
 	return (files);
 }
 
-void	sort_files(t_ls *ft_ls, t_files *file)
+t_files	*sort_files(t_ls *ft_ls, t_files *file, t_dir *direct)
 {
-	if (ft_ls->flags.t_f.t == 1 && ft_ls->flags.t_f.u == 0)
-		file = sort_time_file(file);
-	else
-		file = sort_alp_file(file);
-	if (ft_ls->flags.t_f.r == 1)
-		sort_rev_file(&file);
+	if (ft_ls->flags.t_f.t == 1)
+		file = sort_time_file(file, ft_ls, direct);
+	else if (ft_ls->flags.t_f.f == 0)
+		file = sort_alp_file(file, ft_ls, direct);
+	// if (ft_ls->flags.t_f.r == 1)
+	// 	sort_rev_file(&file);
+	return (file);
 }
 
 void	sort_and_print_files(t_ls *ft_ls, t_dir *direct, t_files *file)
 {
-	sort_files(ft_ls, file);
+	file = sort_files(ft_ls, file, direct);
 	if (ft_ls->flags.t_f.big_r == 1)
 		direct = add_new_direct(direct, file, ft_ls);
 	if (ft_ls->flags.t_f.input == 0 && (((ft_ls->flags.t_f.big_r == 1\
@@ -229,6 +234,6 @@ int		main(int ac, char **av)
 	parsing_arg(ft_ls, ac, av);
 	read_by_filename(ft_ls);
 	free(ft_ls);
-	// system("leaks -q ft_ls");
+	system("leaks -q ft_ls");
 	return (0);
 }

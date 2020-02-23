@@ -12,13 +12,16 @@
 
 #include "../inc/ft_ls.h"
 
-char	*create_l_param_str_2(char *str, t_dir *direct)
+char	*create_l_param_str_2(char *str, t_dir *direct, t_ls *ft_ls)
 {
 	char *itoa_tmp;
 	char *tmp;
 
 	tmp = str;
-	str = ft_strjoin(tmp, "s  %");
+	if (ft_ls->flags.t_f.g == 0 && ft_ls->flags.t_f.o == 0)
+		str = ft_strjoin(tmp, "s  %");
+	else
+		str = ft_strjoin(tmp, "s %");
 	free(tmp);
 	itoa_tmp = ft_itoa(direct->g_name_len);
 	tmp = str;
@@ -31,7 +34,7 @@ char	*create_l_param_str_2(char *str, t_dir *direct)
 	return (str);
 }
 
-char	*create_l_param_str(t_dir *direct)
+char	*create_l_param_str(t_dir *direct, t_ls *ft_ls)
 {
 	char *str;
 	char *itoa_tmp;
@@ -51,7 +54,7 @@ char	*create_l_param_str(t_dir *direct)
 	str = ft_strjoin(tmp, itoa_tmp);
 	free(itoa_tmp);
 	free(tmp);
-	str = create_l_param_str_2(str, direct);
+	str = create_l_param_str_2(str, direct, ft_ls);
 	return (str);
 }
 
@@ -78,9 +81,10 @@ void	print_permissions(t_files *file)
 void	print_second_l(t_files *start, t_ls *ft_ls, t_dir *direct, char *str)
 {
 	print_permissions(start);
-	str = create_l_param_str(direct);
+	str = create_l_param_str(direct, ft_ls);
 	ft_printf(str, start->data->get_lstat.st_nlink,\
-	start->data->user_name, start->data->group_name);
+	ft_ls->flags.t_f.g == 0 ? start->data->user_name : "",\
+	ft_ls->flags.t_f.o == 0 ? start->data->group_name : "");
 	ft_strdel(&str);
 	if (S_ISBLK(start->data->get_lstat.st_mode)\
 		|| S_ISCHR(start->data->get_lstat.st_mode))
@@ -97,6 +101,7 @@ void	print_second_l(t_files *start, t_ls *ft_ls, t_dir *direct, char *str)
 		ft_get_link(direct, start, str);
 	else
 		ft_printf(" %s %s\n", &str[4], start->data->direct_name);
+	free(str);
 }
 
 void	print_l(t_files *file, t_ls *ft_ls, int count, t_dir *direct)

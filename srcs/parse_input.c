@@ -22,7 +22,7 @@ void	set_input_param(t_files *file, char *av)
 	file->data->group_name = ft_strdup(file->data->group->gr_name);
 }
 
-t_dir	*get_first_direct(char *av)
+t_dir	*get_first_direct(char *av, t_ls *ft_ls)
 {
 	t_dir *direct;
 
@@ -32,19 +32,19 @@ t_dir	*get_first_direct(char *av)
 	set_input_param(direct->files, av);
 	direct->files->data->num = 0;
 	direct->count = 0;
-	calc_sizes(direct->files, direct);
+	calc_sizes(direct->files, direct, ft_ls);
 	direct->max_len = ft_strlen(av);
 	direct->filename = NULL;
 	direct->next = NULL;
 	return (direct);
 }
 
-t_dir	*input_to_files(t_dir *direct, char *av)
+t_dir	*input_to_files(t_dir *direct, char *av, t_ls *ft_ls)
 {
 	t_files *start;
 
 	if (!direct)
-		direct = get_first_direct(av);
+		direct = get_first_direct(av, ft_ls);
 	else
 	{
 		start = direct->files;
@@ -55,7 +55,7 @@ t_dir	*input_to_files(t_dir *direct, char *av)
 		start->data = ft_memalloc(sizeof(t_data));
 		set_input_param(start, av);
 		direct->count++;
-		calc_sizes(start, direct);
+		calc_sizes(start, direct, ft_ls);
 		if (direct->max_len < (int)ft_strlen(av))
 			direct->max_len = ft_strlen(av);
 		start->data->num++;
@@ -92,15 +92,15 @@ t_dir	*input_to_dir(t_dir *files, char *av)
 	return (files);
 }
 
-t_dir	*get_filename(t_dir *files, char *av, t_dir **direct)
+t_dir	*get_filename(t_dir *files, char *av, t_dir **direct, t_ls *ft_ls)
 {
 	int		i;
 
-	if (!(i = check_file(av)))
+	if (!(i = check_file(av)) || i == 0)
 		exit(0);
 	if (i == 1)
 		files = input_to_dir(files, av);
 	else
-		*direct = input_to_files(*direct, av);
+		*direct = input_to_files(*direct, av, ft_ls);
 	return (files);
 }

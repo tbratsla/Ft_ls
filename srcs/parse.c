@@ -41,21 +41,34 @@ void	set_arg_flag(t_ls *ft_ls, char *av, int i)
 	if (av[i] == 'l')
 		ft_ls->flags.t_f.l = 1;
 	else if (av[i] == 'r')
-		ft_ls->flags.t_f.r = 1;
+		ft_ls->flags.t_f.r = ft_ls->flags.t_f.f ? 0 : 1;
 	else if (av[i] == 'R')
 		ft_ls->flags.t_f.big_r = 1;
 	else if (av[i] == 'a')
 		ft_ls->flags.t_f.a = 1;
 	else if (av[i] == 't')
-		ft_ls->flags.t_f.t = 1;
+	{
+		ft_ls->flags.t_f.t = ft_ls->flags.t_f.f ? 0 : 1;
+	}
 	else if (av[i] == 'u')
 		ft_ls->flags.t_f.u = 1;
 	else if (av[i] == 'f')
+	{
 		ft_ls->flags.t_f.f = 1;
+		ft_ls->flags.t_f.a = 1;
+		ft_ls->flags.t_f.t = 0;
+		ft_ls->flags.t_f.r = 0;
+	}
 	else if (av[i] == 'g')
+	{
 		ft_ls->flags.t_f.g = 1;
-	else if (av[i] == 'd')
-		ft_ls->flags.t_f.d = 1;
+		ft_ls->flags.t_f.l = 1;
+	}
+	else if (av[i] == 'o')
+	{
+		ft_ls->flags.t_f.o = 1;
+		ft_ls->flags.t_f.l = 1;
+	}
 	else
 	{
 		print_error(3, &av[i], ft_ls);
@@ -90,6 +103,8 @@ void	parsing_result(t_ls *ft_ls, t_dir *direct)
 	else if ((!direct && ft_ls->dir &&\
 		ft_ls->dir->next) || ft_ls->flags.t_f.print == 1)
 	{
+		if (!ft_ls->dir)
+			exit(0);
 		ft_printf("%s:\n", ft_ls->dir->filename);
 	}
 	else if (!ft_ls->dir)
@@ -106,19 +121,20 @@ void	parsing_arg(t_ls *ft_ls, int ac, char **av)
 
 	direct = NULL;
 	i = 1;
-	av = sort_av(ac, av);
 	while (i < ac)
 	{
 		if (av[i][0] == '-' && ft_ls->flags.t_f.file == 0 && av[i][1])
 			get_flag(ft_ls, av[i]);
 		else if (av[i][0] == '-' && ft_ls->flags.t_f.file == 1 && av[i][1])
 			print_error(1, NULL, ft_ls);
-		else if (av[i][0] == '-' && !av[i][1])
+		else if (!ft_strcmp("-", av[i]))
 			print_error(2, av[i], ft_ls);
 		else
 		{
+			if (ft_ls->flags.t_f.f == 0)
+				av = sort_av(ac, av, ft_ls->flags.t_f.r);
 			ft_ls->flags.t_f.file = 1;
-			ft_ls->dir = get_filename(ft_ls->dir, av[i], &direct);
+			ft_ls->dir = get_filename(ft_ls->dir, av[i], &direct, ft_ls);
 		}
 		i++;
 	}
